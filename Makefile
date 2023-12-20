@@ -1,5 +1,5 @@
 build_dir = build
-rhyolite_src = main.py
+rhyolite_src = main.py renderer.py
 
 include rhyolite.mk
 
