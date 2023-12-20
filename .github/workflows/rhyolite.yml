@@ -31,9 +31,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip'
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
+      - name: Setup python dependencies
+        run: pip install -r requirements.txt
       - name: Build with rhyolite
         run: make all
       - name: Upload artifact

@@ -3,7 +3,7 @@ rhyolite_src = main.py
 
 include rhyolite.mk
 
-all: rhyolite_src
+all: rhyolite_gen
 
 clean:
 	rm -r build

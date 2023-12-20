@@ -8,11 +8,11 @@ with the markdown comments rendered
 
 import argparse
 from io import TextIOWrapper
-from html_gen import *
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 import pygments.token
+import markdown
 
 """"
 ## get_args
