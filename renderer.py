@@ -139,12 +139,12 @@ class CodeHtmlFormatter(HtmlFormatter):
 # render
 - in_file
 - out_file
+- returns: The rendered html src code
 Primary function for rendering a source code file
 """
-def render(in_file: TextIOWrapper, out_file: TextIOWrapper):
+def render(in_file: TextIOWrapper):
     in_text = in_file.read()
     formatter = CodeHtmlFormatter()
-    html_src = highlight(in_text, PythonLexer(), formatter)
-    print(html_src, file=out_file)
+    return highlight(in_text, PythonLexer(), formatter)
 
 
