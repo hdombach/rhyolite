@@ -1,4 +1,4 @@
-var is_open = false 
+var is_open = true
 
 function toggleNav() {
   if (is_open) {
