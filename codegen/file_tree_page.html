@@ -1,3 +1,5 @@
+{%- import "file_tree.html" as tn %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +10,10 @@
     <link rel="stylesheet" href="gruvbox.css">
   </head>
   <body>
-    {{ formatted_code}}
+    <div class="highlight">
+      <ul>
+        {{ tn.tree_node(root_node) }}
+      </ul>
+    </div>
   </body>
 </html>

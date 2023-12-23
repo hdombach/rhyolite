@@ -1,0 +1,28 @@
+{%- import "file_tree.html" as tn %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page name</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="gruvbox.css">
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <div>
+      <div id="sidebar" class="gruvbox">
+        <div>
+          <ul style="padding: 1em;">
+            {{ tn.tree_node(root_node) }}
+          </ul>
+        </div>
+      </div>
+      <div id="main">
+        <button class="menubtn" onclick="toggleNav()">☰</button>
+        {{ formatted_code}}
+      </div>
+    </div>
+  </body>
+</html>

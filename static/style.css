@@ -3,58 +3,95 @@
     src: url('Hack/HackNerdFontMono-Regular.ttf');
 }
 
+.menubtn {
+  position: fixed;
+  background: #0000;
+  border-style: none;
+  color: white;
+  font-size: 2em;
+}
+.menubtn:hover {
+  background: #0404045e;
+  transition: 0.2s;
+}
+
+ul {
+  padding-left: 1em;
+}
+
+#sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #1c1c1c;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+  float: left;
+}
+
+#sidebar div {
+  padding-left: 2em;
+}
+
+#main {
+  transition: margin-left .5s;
+  padding: 16px;
+}
+
 .code_block {
   font-family: Hack;
-	margin-bottom: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .markdown_block {
-	color: #aeab9d;
-	border-radius: 1em;
-	padding-left: 1em;
-	padding-right: 1em;
-	padding-top: 0.1em;
-	padding-bottom: 0.1em;
-	margin-left: 2em;
-	box-shadow: 0 0 1em 0 #00000030;
+  color: #aeab9d;
+  border-radius: 1em;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  margin-left: 2em;
+  box-shadow: 0 0 1em 0 #00000030;
 
-	border-width: 1px;
-	border-color: #303030;
-	border-style: solid;
+  border-width: 1px;
+  border-color: #303030;
+  border-style: solid;
 }
 
 .markdown_block code {
-	background: #202020;
-	padding: 0.2em;
-	border-radius: 0.5em;
+  background: #202020;
+  padding: 0.2em;
+  border-radius: 0.5em;
 
-	border-width: 1px;
-	border-color: #303030;
-	border-style: solid;
-}
-
-.content {
-	margin-top: 4em;
-	padding-left: 4em;
-	padding-right: 4em;
+  border-width: 1px;
+  border-color: #303030;
+  border-style: solid;
 }
 
 .highlight {
-	margin-left: 4em;
-	margin-right: 4em;
+  margin-left: 4em;
+  margin-right: 4em;
 }
 
 .num {
-	position: relative;
-	text-align: right;
-	width: 4em;
-	display: inline-block;
-	right: 1em;
-	color: #5e5e5e;
+  position: relative;
+  text-align: right;
+  width: 4em;
+  display: inline-block;
+  right: 1em;
+  color: #5e5e5e;
 }
 
 body {
-	font-family: "Helvetica";
-	color: #e6e6e6 !important;
-	background: #282828;
+  font-family: "Helvetica";
+  color: #e6e6e6 !important;
+  background: #282828;
+}
+
+a {
+  color: #458588;
 }
