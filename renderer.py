@@ -27,7 +27,7 @@ def convert_md(md_src: str, indent: int):
             line = line[1:]
         result += line + "\n"
     result = markdown.markdown(result)
-    return '</pre><div class="markdown_block">' + result + '</div><pre>'
+    return '</pre><div class="markdown_block">' + result + '</div><pre class="code_block">'
 
 """"
 # CodeHtmlFormatter
@@ -121,7 +121,7 @@ class CodeHtmlFormatter(HtmlFormatter):
         is_md = False
         line_num = 0
 
-        yield 0, '<pre>'
+        yield 0, '<pre class="code_block">'
         for i, t in source:
             if is_md:
                 if self._wrap_end(t):
