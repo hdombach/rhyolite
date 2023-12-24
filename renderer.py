@@ -12,22 +12,6 @@ from pygments.formatters import HtmlFormatter
 import pygments.token
 import markdown
 
-""""
-# convert_md
-Converts markdown source to html.  
-**NOTE** Is context dependent becuase it assumes it is
-inside a `<pre>' element.
-"""
-def convert_md(md_src: str, indent: int):
-    result = ""
-    for line in md_src.splitlines():
-        for _ in range(0, indent):
-            if len(line) == 0 or not line[0].isspace():
-                break;
-            line = line[1:]
-        result += line + "\n"
-    result = markdown.markdown(result)
-    return '</pre><div class="markdown_block">' + result + '</div><pre class="code_block">'
 
 """"
 # CodeHtmlFormatter
@@ -45,6 +29,8 @@ class CodeHtmlFormatter(HtmlFormatter):
         super().__init__()
         self._cur_indent: int = 0
         self._cur_clump: str = ""
+        self._is_md = False
+        self._is_code = False
 
     def _reset_state(self):
         self._cur_indent = 0
@@ -76,8 +62,36 @@ class CodeHtmlFormatter(HtmlFormatter):
         super().format(more_tokens, outfile)
 
     """"
+    ## _switch_block
+    - is_code  
+      
+    Switches between code and markdown blocks  
+    Also returns the correct tags to correctly open
+    and close the code/markdown blocks
+    """
+    def _switch_block(self, is_code: bool):
+        result = ""
+        if is_code:
+            if self._is_md:
+                result += "</div>"
+                self._is_md = False
+            if not self._is_code:
+                result += '<pre class="code_block">'
+                self._is_code = True
+
+        else:
+            if self._is_code:
+                result += "</pre>"
+                self._is_code = False
+            if not self._is_md:
+                result += "<div class='markdown_block'>"
+                self._is_md = True
+        return result
+
+    """"
     ## _wrap_start
-    Detects whether a md block starts in the wrap function
+    Detects whether a md block starts in the wrap function  
+      
     - src: The raw html that should be replaced with markdown
     """
     def _wrap_start(self, src: str):
@@ -90,7 +104,8 @@ class CodeHtmlFormatter(HtmlFormatter):
 
     """"
     ## _wrap_end
-    Detects whether a md block ends in the wrap function
+    Detects whether a md block ends in the wrap function  
+      
     - src: The raw html
     """
     def _wrap_end(self, src: str):
@@ -106,9 +121,30 @@ class CodeHtmlFormatter(HtmlFormatter):
     - num
     Adds a number tag a line of html
     """
-    def _wrap_num(self, html_src, num):
-        return f"<span class=\"num\">{num}</span>" + html_src
-        return
+    def _wrap_line(self, html_src, num):
+        result = ""
+        result += self._switch_block(True)
+        result += f"<span class=\"num\">{num}</span>" + html_src
+        return result
+
+
+    """"
+    ## _convert_md
+    Converts markdown source to html.  
+    **NOTE** Is context dependent becuase it assumes it is
+    inside a `<pre>' element.
+    """
+    def _convert_md(self, md_src: str):
+        result = ""
+        for line in md_src.splitlines():
+            for _ in range(0, self._cur_indent):
+                if len(line) == 0 or not line[0].isspace():
+                    break;
+                line = line[1:]
+            result += line + "\n"
+        result = markdown.markdown(result)
+        return self._switch_block(False) + result + self._switch_block(True) 
+
 
     """"
     ## wrap
@@ -118,22 +154,27 @@ class CodeHtmlFormatter(HtmlFormatter):
     Is called after the source code is colorized by `pygment`.
     """
     def wrap(self, source):
-        is_md = False
+        self._is_md = False
+        self._is_code = False
         line_num = 0
 
-        yield 0, '<pre class="code_block">'
         for i, t in source:
-            if is_md:
+            if self._is_md:
                 if self._wrap_end(t):
-                    is_md = False
-                    yield 1, convert_md(self._cur_clump, self._cur_indent)
+                    yield 1, self._convert_md(self._cur_clump)
             else:
                 if self._wrap_start(t):
-                    is_md = True
+                    yield 0, self._switch_block(False)
                 else:
-                    yield i, self._wrap_num(t, line_num)
+                    yield i, self._wrap_line(t, line_num)
             line_num += 1
-        yield 0, '</pre>'
+            yield 0, ""
+
+        if self._is_code:
+            yield 0, '</pre>'
+        if self._is_md:
+            yield 0, '</div>'
+
 
 """"
 # render
