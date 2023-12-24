@@ -88,6 +88,11 @@ ul {
   color: #5e5e5e;
 }
 
+.emojione {
+	width: 1em;
+	height; 1em;
+}
+
 body {
   font-family: "Helvetica";
   color: #e6e6e6 !important;

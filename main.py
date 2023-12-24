@@ -10,7 +10,6 @@ import argparse
 from file_tree import FileTree
 from renderer import render
 import jinja2
-import json
 
 """"
 # get_args

@@ -31,6 +31,10 @@ class CodeHtmlFormatter(HtmlFormatter):
         self._cur_clump: str = ""
         self._is_md = False
         self._is_code = False
+        """"
+        Extions provide links to headers, and emojis :smile:
+        """
+        self._md = markdown.Markdown(extensions=['toc', 'pymdownx.emoji'])
 
     def _reset_state(self):
         self._cur_indent = 0
@@ -142,7 +146,7 @@ class CodeHtmlFormatter(HtmlFormatter):
                     break;
                 line = line[1:]
             result += line + "\n"
-        result = markdown.markdown(result)
+        result = self._md.convert(result)
         return self._switch_block(False) + result + self._switch_block(True) 
 
 
