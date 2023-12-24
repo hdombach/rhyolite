@@ -6,11 +6,14 @@ coloring and markdown for turning markdown to html
 """
 
 from io import TextIOWrapper
+import pathlib
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 import pygments.token
 import markdown
+
+from lang_handlers import LangHandler, lang_handler
 
 
 """"
@@ -25,12 +28,13 @@ a markdown statement
 """
 
 class CodeHtmlFormatter(HtmlFormatter):
-    def __init__(self):
+    def __init__(self, lang_handler: LangHandler):
         super().__init__()
         self._cur_indent: int = 0
         self._cur_clump: str = ""
         self._is_md = False
         self._is_code = False
+        self._lang_handler = lang_handler
         """"
         Extions provide links to headers, and emojis :smile:
         """
@@ -44,8 +48,8 @@ class CodeHtmlFormatter(HtmlFormatter):
     ## _md_token
     Returns whether a token is part of a md comment
     """
-    def _md_token(self, token):
-        return '""""' in token[1] and pygments.token.Literal.String.Doc in token[0]
+    def _md_token(self, token) -> bool:
+        return self._lang_handler.is_md_token(token)
 
     """"
     ## format
@@ -66,30 +70,55 @@ class CodeHtmlFormatter(HtmlFormatter):
         super().format(more_tokens, outfile)
 
     """"
-    ## _switch_block
-    - is_code  
+    ## _start_md_block
       
-    Switches between code and markdown blocks  
-    Also returns the correct tags to correctly open
-    and close the code/markdown blocks
+    Adds html tags to start a md block
+    (add end code tag if necessary)
     """
-    def _switch_block(self, is_code: bool):
+    def _start_md_block(self) -> str:
         result = ""
-        if is_code:
-            if self._is_md:
-                result += "</div>"
-                self._is_md = False
-            if not self._is_code:
-                result += '<pre class="code_block">'
-                self._is_code = True
+        result += self._end_code_block()
+        if not self._is_md:
+            result += '<div class="markdown_block">'
+            self._is_md = True
+        return result
 
-        else:
-            if self._is_code:
-                result += "</pre>"
-                self._is_code = False
-            if not self._is_md:
-                result += "<div class='markdown_block'>"
-                self._is_md = True
+    """"
+    ## _start_code_block
+      
+    Adds html tags to start a code block
+    (and end md tag if necessary)
+    """
+    def _start_code_block(self) -> str:
+        result = ""
+        result += self._end_md_block()
+        if not self._is_code:
+            result += "<pre class='code_block'>"
+            self._is_code = True
+        return result
+
+    """"
+    ## _end_md_block
+      
+    Adds html tags to end a md block
+    """
+    def _end_md_block(self) -> str:
+        result = ""
+        if self._is_md:
+            result += "</div>"
+            self._is_md = False;
+        return result
+
+    """"
+    ## _end_code_block
+      
+    Adds html tags to end a code block
+    """
+    def _end_code_block(self) -> str:
+        result = ""
+        if self._is_code:
+            result += "</pre>"
+            self._is_code = False;
         return result
 
     """"
@@ -98,10 +127,11 @@ class CodeHtmlFormatter(HtmlFormatter):
       
     - src: The raw html that should be replaced with markdown
     """
-    def _wrap_start(self, src: str):
-        if "&quot;&quot;&quot;&quot;\n" in src:
+    def _wrap_start_md(self, src: str):
+        info = self._lang_handler.is_md_wrap_start(src)
+        if info[0]:
             self._reset_state()
-            self._cur_indent = src.find("&")
+            self._cur_indent = info[1]
             return True
         else:
             return False
@@ -112,8 +142,8 @@ class CodeHtmlFormatter(HtmlFormatter):
       
     - src: The raw html
     """
-    def _wrap_end(self, src: str):
-        if "&quot;&quot;&quot;" in src:
+    def _wrap_end_md(self, src: str):
+        if self._lang_handler.is_md_wrap_end(src):
             return True
         else:
             self._cur_clump += src
@@ -126,8 +156,7 @@ class CodeHtmlFormatter(HtmlFormatter):
     Adds a number tag a line of html
     """
     def _wrap_line(self, html_src, num):
-        result = ""
-        result += self._switch_block(True)
+        result = self._start_code_block()
         result += f"<span class=\"num\">{num}</span>" + html_src
         return result
 
@@ -147,7 +176,7 @@ class CodeHtmlFormatter(HtmlFormatter):
                 line = line[1:]
             result += line + "\n"
         result = self._md.convert(result)
-        return self._switch_block(False) + result + self._switch_block(True) 
+        return self._start_md_block() + result + self._end_md_block()
 
 
     """"
@@ -162,22 +191,24 @@ class CodeHtmlFormatter(HtmlFormatter):
         self._is_code = False
         line_num = 0
 
+        if self._wrap_start_md(""):
+            yield 0, self._start_md_block()
+
         for i, t in source:
             if self._is_md:
-                if self._wrap_end(t):
+                if self._wrap_end_md(t):
                     yield 1, self._convert_md(self._cur_clump)
             else:
-                if self._wrap_start(t):
-                    yield 0, self._switch_block(False)
+                if self._wrap_start_md(t):
+                    yield 0, self._start_md_block()
                 else:
                     yield i, self._wrap_line(t, line_num)
             line_num += 1
             yield 0, ""
 
-        if self._is_code:
-            yield 0, '</pre>'
         if self._is_md:
-            yield 0, '</div>'
+            yield 1, self._convert_md(self._cur_clump)
+        yield 0, self._end_md_block() + self._end_code_block()
 
 
 """"
@@ -189,7 +220,7 @@ Primary function for rendering a source code file
 """
 def render(in_file: TextIOWrapper):
     in_text = in_file.read()
-    formatter = CodeHtmlFormatter()
+    formatter = CodeHtmlFormatter(lang_handler(pathlib.Path(in_file.name)))
     return highlight(in_text, PythonLexer(), formatter)
 
 

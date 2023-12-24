@@ -1,9 +1,9 @@
-from os import error
 from typing import Dict, List
 from pathlib import Path
 import pathlib
 
 """"
+# TreeNode
 Either represents a file or a dir in the [File Tree](#filetree)
 """
 
@@ -47,7 +47,7 @@ class TreeNode:
     """
     def add_child(self, child: "TreeNode"):
         if child.name in self.children:
-            raise error(f"file {child.name} already in {self.name}")
+            raise Exception(f"file {child.name} already in {self.name}")
         self.children[child.name] = child
 
 
