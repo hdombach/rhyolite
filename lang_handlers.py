@@ -6,6 +6,7 @@ Tools that are used by the [renderer](renderer.py.html)
 from abc import abstractmethod
 from typing import Tuple
 import pygments
+from pygments.lexers import get_lexer_for_filename
 import pygments.token
 import pathlib
 
@@ -16,11 +17,13 @@ langauge based on the file extensions
 """
 def lang_handler(path: pathlib.Path):
     if path.suffix == ".py":
-        return PythonHandler()
+        return PythonHandler(path.name)
     elif path.suffix == ".md":
-        return MarkdownHandler()
+        return MarkdownHandler(path.name)
+    elif path.suffix == ".h" or path.suffix == ".c":
+        return CHandler(path.name)
     else:
-        return LangHandler()
+        return LangHandler(path.name)
 
 """"
 # LangHandler
@@ -28,8 +31,8 @@ Abstract class that holds generic functions for all
 implimented languages
 """
 class LangHandler:
-    def __init__(self):
-        pass
+    def __init__(self, filename: str):
+        self._filename = filename
 
     """"
     ## is_implimented
@@ -37,6 +40,9 @@ class LangHandler:
     """
     def is_implimented(self) -> bool:
         return False
+
+    def lexer(self):
+        return get_lexer_for_filename(self._filename)
 
     """"
     ## is_md_token
@@ -77,8 +83,8 @@ class LangHandler:
 Impliments LangHandler for python
 """
 class PythonHandler(LangHandler):
-    def __init__(self):
-        pass
+    def __init__(self, filename: str):
+        super().__init__(filename)
 
     def is_implimented(self) -> bool:
         return True
@@ -97,8 +103,8 @@ class PythonHandler(LangHandler):
 Impliments LangHandler for python
 """
 class MarkdownHandler(LangHandler):
-    def __init__(self):
-        pass
+    def __init__(self, filename: str):
+        super().__init__(filename)
 
     def is_implimented(self) -> bool:
         return True
@@ -112,3 +118,22 @@ class MarkdownHandler(LangHandler):
     def is_md_wrap_end(self, src: str) -> bool:
         return False
 
+""""
+# CHandler
+Impliments LangHander for C
+"""
+class CHandler(LangHandler):
+    def __init__(self, filename: str):
+        super().__init__(filename)
+
+    def is_implimented(self) -> bool:
+        return True
+
+    def is_md_token(self, token) -> bool:
+        return '/**' in token[1] and pygments.token.Comment.Multiline in token[0]
+
+    def is_md_wrap_start(self, src: str) -> Tuple[bool, int]:
+        return '/**\n' in src, src.find('*')
+
+    def is_md_wrap_end(self, src: str) -> bool:
+        return '*/' in src

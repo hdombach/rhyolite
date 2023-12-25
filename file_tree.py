@@ -4,7 +4,7 @@ import pathlib
 
 """"
 # TreeNode
-Either represents a file or a dir in the [File Tree](#filetree)
+Either represents a file or a dir in the [FileTree](#filetree)
 """
 
 class TreeNode:

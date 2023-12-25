@@ -7,6 +7,7 @@ with the markdown comments rendered
 """
 
 import argparse
+import pathlib
 from file_tree import FileTree
 from renderer import render
 import jinja2
@@ -45,10 +46,11 @@ def get_args() -> argparse.Namespace:
 """
 def code_gen(in_file_url: str, build_dir_url: str, template: jinja2.Template, root_node):
     in_file = open(in_file_url, "r")
-    out_file = open("./" + build_dir_url + "/" + in_file_url + ".html", "w")
+    out_file_url = "./" + build_dir_url + "/" + in_file_url + ".html"
     rendered_html = render(in_file)
 
-    print(template.render(formatted_code = rendered_html, root_node=root_node), file=out_file)
+    pathlib.Path(out_file_url).parent.mkdir(parents=True, exist_ok=True)
+    print(template.render(formatted_code = rendered_html, root_node=root_node), file=open(out_file_url, "w"))
 
 def main():
     args = get_args()

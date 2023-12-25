@@ -46,7 +46,7 @@ ul {
 }
 
 .code_block {
-  font-family: Hack;
+  font-family: Hack,monospace;
   margin-bottom: 0.5em;
   overflow: auto;
 

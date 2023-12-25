@@ -36,7 +36,7 @@ class CodeHtmlFormatter(HtmlFormatter):
         self._is_code = False
         self._lang_handler = lang_handler
         """"
-        Extions provide links to headers, and emojis :smile:
+        Extions provide links to headers, and emojis :smile: :christmas_tree:
         """
         self._md = markdown.Markdown(extensions=['toc', 'pymdownx.emoji'])
 
@@ -220,7 +220,8 @@ Primary function for rendering a source code file
 """
 def render(in_file: TextIOWrapper):
     in_text = in_file.read()
-    formatter = CodeHtmlFormatter(lang_handler(pathlib.Path(in_file.name)))
-    return highlight(in_text, PythonLexer(), formatter)
+    handler = lang_handler(pathlib.Path(in_file.name))
+    formatter = CodeHtmlFormatter(handler)
+    return highlight(in_text, handler.lexer(), formatter)
 
 
