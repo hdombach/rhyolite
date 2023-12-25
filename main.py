@@ -57,7 +57,6 @@ def code_gen(in_file_url: str, build_dir_url: str, template: jinja2.Template, ro
     correctly included
     """
     root_url = pathlib.Path(out_file_url).relative_to(build_dir_url)
-    print(root_url, len(root_url.parents))
     root_url_str = "./"
     for _ in range(1, len(root_url.parents)):
         root_url_str += "../"

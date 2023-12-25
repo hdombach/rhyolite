@@ -1,6 +1,6 @@
-# reguires rhyolite_src, build_dir
+# reguires rhyolite_src, rhyolite_build_dir
 
 rhyolite_gen:
 	mkdir -p build
 	cp -r static/* build
-	./main.py --in-files $(rhyolite_src) --out-dir $(build_dir)
+	./main.py --in-files $(rhyolite_src) --out-dir $(rhyolite_build_dir)
