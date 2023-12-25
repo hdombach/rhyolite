@@ -1,9 +1,9 @@
-{% macro tree_node(node) %}
+{% macro tree_node(node, root_url) %}
   {% if node.is_dir %}
 	<li><a href="{{root_url}}/{{node.url}}">{{node.name}}</a>
     <ul>
       {% for child in node.children.values() %}
-      {{ tree_node(child)|indent(6) }}
+      {{ tree_node(child, root_url)|indent(6) }}
       {%- endfor %}
     </ul>
   </li>

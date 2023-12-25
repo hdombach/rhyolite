@@ -6,15 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{root_node.name}}</title>
-		<link rel="stylesheet" href="{{root_url}}/style.css">
-		<link rel="stylesheet" href="{{root_url}}/gruvbox.css">
+    <link rel="stylesheet" href="{{root_url}}/style.css">
+    <link rel="stylesheet" href="{{root_url}}/gruvbox.css">
   </head>
   <body>
     <div>
       <div id="sidebar" class="gruvbox">
         <div>
           <ul>
-            {{ tn.tree_node(root_node) }}
+            {{ tn.tree_node(root_node, root_url) }}
           </ul>
         </div>
       </div>
@@ -23,6 +23,6 @@
         {{ formatted_code}}
       </div>
     </div>
-		<script src="{{root_url}}/index.js"></script>
+    <script src="{{root_url}}/index.js"></script>
   </body>
 </html>
