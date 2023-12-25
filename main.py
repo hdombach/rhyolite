@@ -50,7 +50,19 @@ def code_gen(in_file_url: str, build_dir_url: str, template: jinja2.Template, ro
     rendered_html = render(in_file)
 
     pathlib.Path(out_file_url).parent.mkdir(parents=True, exist_ok=True)
-    print(template.render(formatted_code = rendered_html, root_node=root_node), file=open(out_file_url, "w"))
+
+    """"
+    Figure out the position of the root directory in relation to the 
+    file currently being rendered so that files like `index.js` can be
+    correctly included
+    """
+    root_url = pathlib.Path(out_file_url).relative_to(build_dir_url)
+    print(root_url, len(root_url.parents))
+    root_url_str = "./"
+    for _ in range(1, len(root_url.parents)):
+        root_url_str += "../"
+
+    print(template.render(formatted_code = rendered_html, root_node=root_node, root_url=root_url_str), file=open(out_file_url, "w"))
 
 def main():
     args = get_args()
@@ -62,7 +74,7 @@ def main():
     print(tree.root_node)
     for in_file_url in args.in_files:
         code_gen(in_file_url, args.out_dir, page_template, tree.root_node)
-    print(tree_template.render(root_node = tree.root_node), file=open(args.out_dir + "/index.html", "w"))
+    print(tree_template.render(root_node = tree.root_node, root_url="./"), file=open(args.out_dir + "/index.html", "w"))
 
 if __name__ == "__main__":
     main()
